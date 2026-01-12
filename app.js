@@ -8,16 +8,14 @@ const path = require("path");
 const ejsMate = require("ejs-mate");
 const session = require("express-session");
 const flash = require("connect-flash");
-
-//const Listing = require("./models/listing");
-//const wrapAsync = require("./utils/wrapAsync");
-//const { listingSchema, reviewSchema } = require("./schemas");
 const AppError = require("./errors/AppError");
 const { validateListing, validateReview } = require("./middleware");
-//const Review = require("./models/review");
-
-const listings = require("./routes/listing");
-const reviews = require("./routes/review");
+const listingsRouter = require("./routes/listing");
+const reviewsRouter = require("./routes/review");
+const userRouter = require("./routes/user,js");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user");
 
 // Initialize app
 const app = express();
@@ -64,18 +62,33 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/listings", listings);
+// Passport.js setup
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
 
-app.use("/listings/:id/reviews", reviews);
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+// app.get("/demouser", async (req, res) => {
+//  let fakeUser = new User({username: "demouser", email: "demouser@example.com"});
+//  let registeredUser = await User.register(fakeUser, "demouserpassword");
+//  res.send(registeredUser);
+// });
+
+
+app.use("/listings", listingsRouter);
+app.use("/listings/:id/reviews", reviewsRouter);
+app.use("/", userRouter);
 
 // ==============================
 //      ERROR HANDLING
 // ==============================
 
 // 404
-app.use((req, res, next) => {
-  next(new AppError("Page Not Found", 404));
-});
+// app.use((req, res, next) => {
+//   next(new AppError("Page Not Found", 404));
+// });
 
 
 // Central Error Handler
