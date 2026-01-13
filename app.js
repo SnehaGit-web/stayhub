@@ -1,6 +1,9 @@
 // ==============================
 //         REQUIREMENTS
 // ==============================
+if(process.env.NODE_ENV !== "production"){
+require("dotenv").config();
+}
 const express = require("express");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
@@ -12,7 +15,7 @@ const AppError = require("./errors/AppError");
 const { validateListing, validateReview } = require("./middleware");
 const listingsRouter = require("./routes/listing");
 const reviewsRouter = require("./routes/review");
-const userRouter = require("./routes/user,js");
+const userRouter = require("./routes/user");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
@@ -53,28 +56,25 @@ const sessionOptions = {
     maxAge: 1000 * 60 * 60 * 24 * 7
   },
 };
+
 app.use(session(sessionOptions));
 app.use(flash());
-// Flash Middleware
-app.use((req, res, next) => {
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
-  next();
-});
 
 // Passport.js setup
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
 
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// app.get("/demouser", async (req, res) => {
-//  let fakeUser = new User({username: "demouser", email: "demouser@example.com"});
-//  let registeredUser = await User.register(fakeUser, "demouserpassword");
-//  res.send(registeredUser);
-// });
+// Flash + currentUser middleware (AFTER passport)
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  res.locals.currentUser = req.user;
+  next();
+});
 
 
 app.use("/listings", listingsRouter);
