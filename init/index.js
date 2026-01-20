@@ -1,7 +1,10 @@
+if(process.env.NODE_ENV !== "production"){
+require("dotenv").config();
+}
 const mongoose = require("mongoose");
 const initData = require("./data.js");
 const Listing = require("../models/listing.js");
-const MONGO_URL = "mongodb://localhost:27017/stayhub";
+const MONGO_URL = process.env.ATLASDB_URL;
 
 main().then(() => console.log("✅ MongoDB connection successful"))
 .catch((err) => console.log("❌ MongoDB connection error:", err));
