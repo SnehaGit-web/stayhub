@@ -10,6 +10,7 @@ const methodOverride = require("method-override");
 const path = require("path");
 const ejsMate = require("ejs-mate");
 const session = require("express-session");
+const MongoDBStore = require("connect-mongo");
 const flash = require("connect-flash");
 const AppError = require("./errors/AppError");
 const { validateListing, validateReview } = require("./middleware");
@@ -38,16 +39,25 @@ app.set("views", path.join(__dirname, "views"));
 // ==============================
 //       DATABASE CONNECTION
 // ==============================
-mongoose.connect("mongodb://localhost:27017/stayhub")
+
+const ATLAS_URI = process.env.ATLASDB_URL;
+mongoose.connect(ATLAS_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log(err));
 
-// ==============================
-//           ROUTES
-// ==============================
+const store = MongoDBStore.create({
+  mongoUrl: ATLAS_URI,
+  secret: process.env.SECRET,
+  touchAfter: 24 * 60 * 60 // 24 hours
+});
+
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR", e);
+});
 
 const sessionOptions = {
-  secret: "thisshouldbeabettersecret!",
+  store: store,
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -59,6 +69,11 @@ const sessionOptions = {
 
 app.use(session(sessionOptions));
 app.use(flash());
+
+// ==============================
+//           ROUTES
+// ==============================
+
 
 // Passport.js setup
 app.use(passport.initialize());
@@ -85,10 +100,10 @@ app.use("/", userRouter);
 //      ERROR HANDLING
 // ==============================
 
-// 404
-// app.use((req, res, next) => {
-//   next(new AppError("Page Not Found", 404));
-// });
+//404 Handler
+app.use((req, res, next) => {
+  next(new AppError("Page Not Found", 404));
+});
 
 
 // Central Error Handler

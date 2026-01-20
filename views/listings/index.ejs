@@ -1,10 +1,96 @@
 <% layout('layouts/boilerplate') %>
-
-    <h3>Welcome to StayHub Listings</h3>
-    <!-- <form method="GET" action="/listings/new">
-        <button>Create New Listing</button>
-    </form> -->
-    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+    <style>
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+            opacity: 0.8;
+        }
+        .filter:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+        }
+        .filter p{
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .tax-info{
+            display: none;
+        }
+        .tax-switch{
+            border: 1px solid #000000;
+            height: 3.25rem;
+            border-radius: 1rem;
+            padding: 1rem;
+            cursor: pointer;
+            margin-left: 2rem;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+    <div id="filters">
+        <div class="filter">
+            <div><i class="fa-solid fa-fire"></i></div>
+            <p>Trending</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-bed"></i></div>
+            <p>Rooms</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-mountain-city"></i></div>
+            <p>Iconic Cities</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-mountain"></i></div>
+            <p>Mountains</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-brands fa-fort-awesome"></i></div>
+            <p>Castles</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-person-swimming"></i></div>
+            <p>Amazing Pools</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-campground"></i></div>
+            <p>Camping</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-cow"></i></div>
+            <p>Farms</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-regular fa-snowflake"></i></div>
+            <p>Arctic</p>
+        </div>
+         <div class="filter">
+            <div><i class="fa-solid fa-igloo"></i></div>
+            <p>Domes</p>
+        </div>
+        <div class="filter">
+            <div><i class="fa-solid fa-ship"></i></div>
+            <p>Boats</p>
+        </div>
+    <div class="tax-switch">
+        <div class="form-check form-switch form-check-reverse">
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>    
+        </div>
+    </div>
+    
+    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
         <% allListings.forEach(listing => { %>
         <a class="listing-link" href="/listings/<%= listing._id %>">
         <div class="card col">
@@ -14,11 +100,25 @@
                 <p class="card-text">
                     <b><%= listing.title %></b><br>
                     $<%= listing.price.toLocaleString("en-US") %> / night<br>
+                    <i class="tax-info">&nbsp;&nbsp;+6% Tax</i>
                 </p>
             </div>
         </div>
         </a>
         <% }) %>
     </div>
+    <script>
+        const taxSwitch = document.getElementById('flexSwitchCheckDefault');
+        taxSwitch.addEventListener('change', () => {
+            const taxInfos = document.querySelectorAll('.tax-info');
+            taxInfos.forEach(taxInfo => {
+                if(taxSwitch.checked){
+                    taxInfo.style.display = 'inline';
+                } else {
+                    taxInfo.style.display = 'none';
+                }
+            });
+        });
+    </script>
      
 
