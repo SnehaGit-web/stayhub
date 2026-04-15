@@ -5,6 +5,14 @@ A full-stack vacation rental platform built with Node.js, Express, MongoDB, and 
 
 ---
 
+## Live Demo
+
+🌐 **[https://stayhub-jkel.onrender.com](https://stayhub-jkel.onrender.com)**
+
+> Note: Free tier on Render — first load may take 30 seconds to wake up.
+
+---
+
 ## Features
 
 **Guests**
